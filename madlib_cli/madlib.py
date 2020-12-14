@@ -7,14 +7,30 @@ import re
 
 # -------GLOBAL VARIABLES---------
 template_string = ""
-
+contents_of_file = []
 language_parts = []
 stripped_string = []
-
-
+user_input_list = []
 
 
 # -------WELCOME MESSAGE---------
+
+user_name = input(
+"""Oh hello there! 
+
+Welcome to MadLibs
+
+What\'s your name? > """)
+
+print('Nice to meet you, ' + user_name + " (That's such a 102 thing to do. Annnnyways....)")
+
+welcome = input(
+""" Let's play! 
+
+It's not too hard - first you'll tell me which file you'd like to find, then I'll ask you to enter a series of words &, finally, I'll return your story.
+
+So which file do you want to access? If you don't know the path, just hit enter and I'll pick one for you. > """) or "assets/madlib_template.txt"
+
 
 
 
@@ -24,26 +40,27 @@ def read_template(path):
         with open(path, 'r') as template:
             contents = template.read()
             template_string = str(contents)
-            print(contents)
+            # print(contents)
+            contents_of_file.append(contents)
             return contents
     except FileNotFoundError: 
         raise FileNotFoundError ("File not found")
 
 
-# read_template('assets/madlib_template.txt')
-# print("*******************************")
-# print(template_string)
+read_template(welcome)
 
 
-def parse_template(string):
-    # ---------------collect language parts -> return tuple----------------
+
+def parse_template(incoming_message):
+    string = str(incoming_message)
+    # collect language parts -> return tuple
     lang_objects = re.findall(r"\{.*?\}", string) 
     for i in lang_objects:
         result = (i[1:-1])
         language_parts.append(str(result))
     language_parts_to_tuple = tuple(language_parts)
 
-    # ---------------remove language parts -> return string-----------------
+    # remove language parts -> return string
     removed_result = re.sub(r"\{.*?\}", "{}", string)
     stripped_string.append(removed_result)
     string_return = ""
@@ -53,12 +70,11 @@ def parse_template(string):
     # ---------------return -----------------
     return (string_return, language_parts_to_tuple)
 
+parse_template(contents_of_file)
 
-
-# parse_template("It was a {Adjective} and {Adjective} {Noun}.")
 
 # ---------COLLECT USER INPUT---------
-user_input_list = []
+
 
 def user_inputs(list_of_language_parts): 
     for words in list_of_language_parts: 
@@ -69,35 +85,35 @@ def user_inputs(list_of_language_parts):
             user_input_list.append(input("Type in a " + words.lower() + ": ")) 
     return user_input_list   
 
-
+user_inputs(language_parts)
 # user_inputs(["Adjective", "noun", "Verb"])
 
 
 def merge(template, user_list):
-    #takes in a bare template & user inputs
-    # loop through the result of language_parts_to_tuple temp - for each thing in the list - generate a list of req input messages for user
-    # print(user_list)
+    if isinstance(template, str) != True:
+        unnest_once = ""
+        unnest_again = ""
+
+        for element in template:  
+            unnest_once += element
+        for element in unnest_once: 
+            unnest_again +=element
+        results = unnest_again.split()
+    else: 
+        results = template.split()
+    # this is not pretty, I am very aware. But it works ¯\_(ツ)_/¯ 
+
     switch_from_tuple = list(user_list)
-    # print("SWITCH")
-    # print(switch_from_tuple)
     complete_string = []
-    # template_replace = template
-    
     current_index = 0
-    # //add to only if replaced
+    
 
-    res = template.split()
-
-# LOOPS THROUGH WORDS
-    for i in res:   
-        # IF WORD IS [], REPLACE WITH A VALUE FROM USER INPUT, THEN INCREASE YOUR CURRENT INDEX
+    # LOOPS THROUGH WORDS
+    for i in results:   
+        # IF WORD IS {}, REPLACE WITH A VALUE FROM USER INPUT, THEN INCREASE YOUR CURRENT INDEX
         if i.startswith('{}'):
             replace_a_bracket = i.replace('{}', switch_from_tuple[current_index], 1)
-            # complete_string.append(switch_from_tuple[current_index])
             complete_string.append(replace_a_bracket)
-            # print(switch_from_tuple[current_index])
-            # print('------')
-            # print(current_index)
             current_index += 1
         else:
             complete_string.append(i)
@@ -109,43 +125,44 @@ def merge(template, user_list):
         madlib_string += (each_word + " ")
 
     complete_madlib = madlib_string[:-1]
-    
-    # for i in switch_from_tuple:
-    #     print("******")
-    #     print(template)
-    #     print("******")
-    #     print(i)
-    #     # complete_string = re.sub(r"\{.*?\}", "i")
-    #     replace_a_bracket = template.replace("{}", i, 1)
-    #     complete_string.append(replace_a_bracket)
-    #     template_replace = template.replace("{}", i, 1)
-    #     print("******COMPLETE STRING")
-    #     print(complete_string)        
-    #     print("******TEMP REPLACE")
-    #     print(template_replace)
-
-
-    # # LOOPS THROUGH LETTERS IN TEMPLATE
-    # for i in template:
-    
-
-
+    print(complete_madlib)
     return complete_madlib 
 
+
+merge(stripped_string, user_input_list)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # merge("It was a {} and {} {}.", ("dark", "stormy", "night"))
-    
-    
-    
 # Stretch Goals
 # TODO Figure out / research a way to verify terminal input/output.
 # TODO Test that completed madlib is properly written to disk with correct content.
 
-
-
-
-
-
-  
     # print(stripped_string.join(removed_result))
     # listToStr = stripped_string.join([str(elem) for elem in removed_result])
     
