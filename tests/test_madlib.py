@@ -9,7 +9,7 @@ def test_version():
 # -------------------------READ TEMPLATE-------------------------------
 
 def test_read_template_returns_stripped_string():
-    actual = read_template("assets/dark_and_stormy_night.txt")
+    actual = read_template("madlib_cli/assets/dark_and_stormy_night.txt")
     expected = "It was a {Adjective} and {Adjective} {Noun}."
     assert actual == expected
 
